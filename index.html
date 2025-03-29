@@ -8,15 +8,12 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-image: url('https://i.imgur.com/om9QjP1.jpg');
-      background-size: cover;
-      background-position: center;
+      background-color: #1a1a2e;
       color: #fff;
       text-align: center;
     }
 
     .overlay {
-      background-color: rgba(0,0,0,0.7);
       padding: 40px 20px;
       min-height: 100vh;
     }
@@ -56,9 +53,6 @@
         #2ecc71 180deg 270deg,
         #3498db 270deg 360deg
       );
-      display: flex;
-      align-items: center;
-      justify-content: center;
       position: relative;
       transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
     }
@@ -67,11 +61,13 @@
       position: absolute;
       width: 100%;
       height: 100%;
-      text-align: center;
-      line-height: 320px;
-      font-size: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
       font-weight: bold;
       color: #000;
+      pointer-events: none;
     }
 
     button {
@@ -102,7 +98,7 @@
       width: 100%;
       height: 100%;
       pointer-events: none;
-      background-image: url('https://i.imgur.com/JpT9S8D.gif');
+      background-image: url('https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif');
       background-size: cover;
       z-index: 999;
       display: none;
@@ -140,7 +136,7 @@
   <div id="wheel-container">
     <div id="pointer"></div>
     <div id="wheel">
-      <div class="sector-label">?</div>
+      <div class="sector-label" id="label">?</div>
     </div>
   </div>
 
@@ -167,21 +163,25 @@
 
 <div class="confetti" id="confetti"></div>
 
+<audio id="winSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+<audio id="spinSound" src="https://www.soundjay.com/button/beep-07.mp3"></audio>
+
 <script>
   let spinning = false;
   let currentRotation = 0;
   let userCount = 17;
 
   const prizes = [0, 50, 100, 500];
-  const colors = ['#e74c3c', '#f1c40f', '#2ecc71', '#3498db'];
   const sectorAngle = 360 / prizes.length;
 
   const wheel = document.getElementById("wheel");
   const resultEl = document.getElementById("result");
   const spinBtn = document.getElementById("spinBtn");
   const confetti = document.getElementById("confetti");
-  const label = document.querySelector(".sector-label");
+  const label = document.getElementById("label");
   const userCountEl = document.getElementById("userCount");
+  const winSound = document.getElementById("winSound");
+  const spinSound = document.getElementById("spinSound");
 
   function spin() {
     if (spinning) return;
@@ -190,6 +190,7 @@
     spinBtn.disabled = true;
     resultEl.innerHTML = "Крутим...";
     label.textContent = "?";
+    spinSound.play();
 
     const sector = Math.floor(Math.random() * prizes.length);
     const stopAngle = 360 * 5 + sector * sectorAngle + sectorAngle / 2;
@@ -201,7 +202,10 @@
       const prize = prizes[sector];
       label.textContent = prize + "₽";
       resultEl.innerHTML = prize === 0 ? "Увы, не повезло." : `Ты выиграл ${prize}₽!`;
-      if (prize > 0) confetti.style.display = "block";
+      if (prize > 0) {
+        confetti.style.display = "block";
+        winSound.play();
+      }
 
       setTimeout(() => {
         confetti.style.display = "none";

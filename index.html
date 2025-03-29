@@ -253,7 +253,7 @@
       share: [
         "Поделись с друзьями и получи бонус!",
         "Скопируй и отправь им эту ссылку:<br><b>https://chatgpt4142141241241.github.io/vk-cash-test/</b>",
-        "Или нажми на кнопку: 🔗 Скопировать ссылку",
+        "Или нажми на кнопку ниже:", "<button onclick=\"copyLink()\">🔗 Скопировать ссылку</button>", "<div id=\"copyMsg\"></div>",
         "👥 Приглашай друзей и получай +1 крутку за каждого участника!"
       ]
     };
@@ -271,6 +271,15 @@
 
   function closeModal() {
     modal.style.display = "none";
+  }
+
+  function copyLink() {
+    const link = "https://chatgpt4142141241241.github.io/vk-cash-test/";
+    navigator.clipboard.writeText(link).then(() => {
+      document.getElementById("copyMsg").innerHTML = "<br><span style='color:lightgreen;'>✅ Скопировано!</span>";
+    }).catch(() => {
+      document.getElementById("copyMsg").innerHTML = "<br><span style='color:red;'>❌ Не удалось скопировать</span>";
+    });
   }
 </script>
 </body>

@@ -30,18 +30,6 @@
       height: 320px;
     }
 
-    #pointer {
-      width: 0;
-      height: 0;
-      border-left: 20px solid transparent;
-      border-right: 20px solid transparent;
-      border-top: 30px solid #FFD700;
-      position: absolute;
-      bottom: -40px;
-      left: calc(50% - 20px);
-      z-index: 10;
-    }
-
     #wheel {
       width: 100%;
       height: 100%;
@@ -113,11 +101,12 @@
 
   <div id="wheel-container">
     <div id="wheel"></div>
-    <div id="pointer"></div>
   </div>
 
   <button id="spinBtn" onclick="spin()">Крутить</button>
   <div class="result" id="result"></div>
+
+  <button id="payBtn" onclick="unlock()" style="display:none;">Попробовать снова за 50₽</button>
 
   <div class="sidebar">
     <h3>ТОП Победителей дня:</h3>
@@ -137,41 +126,89 @@
   </div>
 </div>
 
+<audio id="bgMusic" autoplay loop>
+  <source src="https://cdn.pixabay.com/audio/2022/10/25/audio_9abf4dd34d.mp3" type="audio/mpeg">
+</audio>
+
 <script>
   let spinning = false;
   let currentRotation = 0;
   let userCount = 17;
+  let canSpin = true;
+  const adminMode = true;
 
-  const prizes = [0, 50, 100, 500];
-  const sectorAngle = 360 / prizes.length;
+  const chances = [
+    { prize: 0, chance: 75 },
+    { prize: 50, chance: 15 },
+    { prize: 100, chance: 7 },
+    { prize: 500, chance: 3 }
+  ];
 
   const wheel = document.getElementById("wheel");
   const resultEl = document.getElementById("result");
   const spinBtn = document.getElementById("spinBtn");
+  const payBtn = document.getElementById("payBtn");
   const userCountEl = document.getElementById("userCount");
+  const topWinners = document.getElementById("topWinners");
+
+  function getPrize() {
+    const rand = Math.random() * 100;
+    let cumulative = 0;
+    for (let i = 0; i < chances.length; i++) {
+      cumulative += chances[i].chance;
+      if (rand < cumulative) return chances[i].prize;
+    }
+    return 0;
+  }
 
   function spin() {
-    if (spinning) return;
+    if (spinning || (!canSpin && !adminMode)) return;
 
     spinning = true;
     spinBtn.disabled = true;
     resultEl.innerHTML = "Крутим...";
 
-    const sector = Math.floor(Math.random() * prizes.length);
-    const stopAngle = 360 * 5 + sector * sectorAngle + sectorAngle / 2;
+    const prize = getPrize();
+    const sector = chances.findIndex(c => c.prize === prize);
+    const stopAngle = 360 * 5 + sector * 90 + 45;
     currentRotation += stopAngle;
 
     wheel.style.transform = `rotate(${currentRotation}deg)`;
 
     setTimeout(() => {
-      const prize = prizes[sector];
       resultEl.innerHTML = prize === 0 ? "Увы, не повезло." : `🎉 Ты выиграл ${prize}₽!`;
-      spinBtn.disabled = false;
       spinning = false;
-      userCount++;
+
+      if (!adminMode) {
+        canSpin = false;
+        payBtn.style.display = "inline-block";
+      }
+
+      spinBtn.disabled = !adminMode;
+
+      userCount += Math.floor(Math.random() * 3) + 1;
       userCountEl.textContent = userCount;
     }, 5000);
   }
+
+  function unlock() {
+    canSpin = true;
+    spinBtn.disabled = false;
+    payBtn.style.display = "none";
+  }
+
+  const names = ["Алексей", "Мария", "Игорь", "Светлана", "Денис", "Ольга", "Сергей", "Екатерина"];
+  const prizesFake = [50, 100, 500];
+
+  setInterval(() => {
+    const ul = topWinners;
+    ul.innerHTML = "";
+    for (let i = 0; i < 3; i++) {
+      const name = names[Math.floor(Math.random() * names.length)];
+      const prize = prizesFake[Math.floor(Math.random() * prizesFake.length)];
+      ul.innerHTML += `<li>👤 ${name} — ${prize}₽</li>`;
+    }
+  }, 30000);
 </script>
 </body>
 </html>

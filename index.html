@@ -126,7 +126,7 @@
   </div>
 </div>
 
-<audio id="bgMusic" autoplay loop>
+<audio id="bgMusic" loop>
   <source src="https://cdn.pixabay.com/audio/2022/10/25/audio_9abf4dd34d.mp3" type="audio/mpeg">
 </audio>
 
@@ -209,6 +209,12 @@
       ul.innerHTML += `<li>👤 ${name} — ${prize}₽</li>`;
     }
   }, 30000);
+
+  // Запуск музыки при первом клике
+  document.addEventListener("click", () => {
+    const music = document.getElementById("bgMusic");
+    music.play().catch(() => {});
+  }, { once: true });
 </script>
 </body>
 </html>

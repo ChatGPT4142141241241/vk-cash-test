@@ -93,6 +93,20 @@
       border-radius: 5px;
     }
 
+    #musicToggle {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 10px;
+      font-size: 16px;
+      background-color: #FFD700;
+      border: none;
+      border-radius: 8px;
+      color: #000;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
   </style>
 </head>
 <body>
@@ -126,6 +140,8 @@
   </div>
 </div>
 
+<button id="musicToggle" onclick="toggleMusic()">🎵 Музыка</button>
+
 <audio id="bgMusic" loop>
   <source src="https://cdn.pixabay.com/audio/2022/10/25/audio_9abf4dd34d.mp3" type="audio/mpeg">
 </audio>
@@ -136,6 +152,7 @@
   let userCount = 17;
   let canSpin = true;
   const adminMode = true;
+  let musicPlaying = false;
 
   const chances = [
     { prize: 0, chance: 75 },
@@ -150,6 +167,8 @@
   const payBtn = document.getElementById("payBtn");
   const userCountEl = document.getElementById("userCount");
   const topWinners = document.getElementById("topWinners");
+  const bgMusic = document.getElementById("bgMusic");
+  const musicToggle = document.getElementById("musicToggle");
 
   function getPrize() {
     const rand = Math.random() * 100;
@@ -197,6 +216,17 @@
     payBtn.style.display = "none";
   }
 
+  function toggleMusic() {
+    if (musicPlaying) {
+      bgMusic.pause();
+      musicToggle.innerText = "🎵 Музыка";
+    } else {
+      bgMusic.play().catch(() => {});
+      musicToggle.innerText = "🔇 Выкл";
+    }
+    musicPlaying = !musicPlaying;
+  }
+
   const names = ["Алексей", "Мария", "Игорь", "Светлана", "Денис", "Ольга", "Сергей", "Екатерина"];
   const prizesFake = [50, 100, 500];
 
@@ -209,12 +239,6 @@
       ul.innerHTML += `<li>👤 ${name} — ${prize}₽</li>`;
     }
   }, 30000);
-
-  // Запуск музыки при первом клике
-  document.addEventListener("click", () => {
-    const music = document.getElementById("bgMusic");
-    music.play().catch(() => {});
-  }, { once: true });
 </script>
 </body>
 </html>

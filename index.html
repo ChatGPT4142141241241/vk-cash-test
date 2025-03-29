@@ -6,108 +6,212 @@
   <title>Крутани и Забери</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-image: url('https://i.imgur.com/om9QjP1.jpg');
+      background-size: cover;
+      background-position: center;
+      color: #fff;
       text-align: center;
-      padding: 50px;
-      background: linear-gradient(135deg, #f9f9f9, #e0e0ff);
     }
+
+    .overlay {
+      background-color: rgba(0,0,0,0.7);
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
     h1 {
-      font-size: 32px;
+      font-size: 40px;
       margin-bottom: 20px;
     }
-    #wheel {
-      width: 300px;
-      height: 300px;
-      border-radius: 50%;
-      border: 10px solid #4CAF50;
-      margin: 0 auto;
+
+    #wheel-container {
       position: relative;
-      background: conic-gradient(
-        #f44336 0deg 90deg,
-        #ffeb3b 90deg 180deg,
-        #4CAF50 180deg 270deg,
-        #2196F3 270deg 360deg
-      );
-      transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
+      margin: 0 auto;
+      width: 320px;
+      height: 320px;
     }
+
     #pointer {
-      width: 0; 
-      height: 0; 
+      width: 0;
+      height: 0;
       border-left: 20px solid transparent;
       border-right: 20px solid transparent;
-      border-bottom: 30px solid #000;
+      border-bottom: 30px solid #FFD700;
       position: absolute;
       top: -40px;
       left: calc(50% - 20px);
+      z-index: 10;
     }
+
+    #wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 10px solid #FFD700;
+      background: conic-gradient(
+        #e74c3c 0deg 90deg,
+        #f1c40f 90deg 180deg,
+        #2ecc71 180deg 270deg,
+        #3498db 270deg 360deg
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
+    }
+
+    .sector-label {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      line-height: 320px;
+      font-size: 26px;
+      font-weight: bold;
+      color: #000;
+    }
+
     button {
-      margin-top: 30px;
+      margin-top: 20px;
       font-size: 20px;
       padding: 10px 30px;
-      background-color: #4CAF50;
+      background-color: #FFD700;
       border: none;
-      color: white;
+      color: black;
       border-radius: 8px;
       cursor: pointer;
     }
+
     button:disabled {
       background-color: #888;
       cursor: not-allowed;
     }
+
     .result {
       font-size: 24px;
-      margin-top: 30px;
+      margin-top: 20px;
       font-weight: bold;
-      color: #333;
     }
+
+    .confetti {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background-image: url('https://i.imgur.com/JpT9S8D.gif');
+      background-size: cover;
+      z-index: 999;
+      display: none;
+    }
+
+    .sidebar {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      margin-top: 30px;
+      border-radius: 10px;
+      color: #fff;
+    }
+
+    .sidebar h3 {
+      margin-top: 0;
+    }
+
+    .info-buttons {
+      margin-top: 30px;
+    }
+
+    .info-buttons button {
+      margin: 5px;
+      padding: 10px 20px;
+      background-color: #333;
+      color: white;
+    }
+
   </style>
 </head>
 <body>
+<div class="overlay">
   <h1>Крутани и Забери</h1>
+
   <div id="wheel-container">
     <div id="pointer"></div>
-    <div id="wheel"></div>
+    <div id="wheel">
+      <div class="sector-label">?</div>
+    </div>
   </div>
+
   <button id="spinBtn" onclick="spin()">Крутить</button>
   <div class="result" id="result"></div>
 
-  <script>
-    let spinning = false;
-    let currentRotation = 0;
-    const wheel = document.getElementById("wheel");
-    const resultEl = document.getElementById("result");
-    const btn = document.getElementById("spinBtn");
+  <div class="sidebar">
+    <h3>ТОП Победителей дня:</h3>
+    <ul id="topWinners">
+      <li>🧑 Алексей — 500₽</li>
+      <li>👩 Мария — 100₽</li>
+      <li>🧔 Игорь — 50₽</li>
+    </ul>
+    <p>🧮 Участников сегодня: <span id="userCount">17</span></p>
+  </div>
 
-    const sectors = [
-      { prize: 0, color: "#f44336" },
-      { prize: 50, color: "#ffeb3b" },
-      { prize: 100, color: "#4CAF50" },
-      { prize: 500, color: "#2196F3" }
-    ];
+  <div class="info-buttons">
+    <button>📜 Правила участия</button>
+    <button>❓ FAQ</button>
+    <button>📋 Политика</button>
+    <button>📲 Поделиться</button>
+  </div>
+</div>
 
-    function spin() {
-      if (spinning) return;
-      spinning = true;
-      btn.disabled = true;
-      resultEl.innerHTML = "Крутим...";
+<div class="confetti" id="confetti"></div>
 
-      const sectorAngle = 360 / sectors.length;
-      const randSector = Math.floor(Math.random() * sectors.length);
-      const stopAngle = 360 * 5 + randSector * sectorAngle + sectorAngle / 2;
+<script>
+  let spinning = false;
+  let currentRotation = 0;
+  let userCount = 17;
 
-      currentRotation += stopAngle;
-      wheel.style.transform = `rotate(${currentRotation}deg)`;
+  const prizes = [0, 50, 100, 500];
+  const colors = ['#e74c3c', '#f1c40f', '#2ecc71', '#3498db'];
+  const sectorAngle = 360 / prizes.length;
+
+  const wheel = document.getElementById("wheel");
+  const resultEl = document.getElementById("result");
+  const spinBtn = document.getElementById("spinBtn");
+  const confetti = document.getElementById("confetti");
+  const label = document.querySelector(".sector-label");
+  const userCountEl = document.getElementById("userCount");
+
+  function spin() {
+    if (spinning) return;
+
+    spinning = true;
+    spinBtn.disabled = true;
+    resultEl.innerHTML = "Крутим...";
+    label.textContent = "?";
+
+    const sector = Math.floor(Math.random() * prizes.length);
+    const stopAngle = 360 * 5 + sector * sectorAngle + sectorAngle / 2;
+    currentRotation += stopAngle;
+
+    wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+    setTimeout(() => {
+      const prize = prizes[sector];
+      label.textContent = prize + "₽";
+      resultEl.innerHTML = prize === 0 ? "Увы, не повезло." : `Ты выиграл ${prize}₽!`;
+      if (prize > 0) confetti.style.display = "block";
 
       setTimeout(() => {
-        const prize = sectors[randSector].prize;
-        resultEl.innerHTML = prize === 0 
-          ? "Увы, не повезло. Попробуй ещё!" 
-          : `Ты выиграл ${prize}₽!`;
-
-        btn.disabled = false;
+        confetti.style.display = "none";
+        spinBtn.disabled = false;
         spinning = false;
-      }, 5000);
-    }
-  </script>
+        userCount++;
+        userCountEl.textContent = userCount;
+      }, 4000);
+    }, 5000);
+  }
+</script>
 </body>
 </html>

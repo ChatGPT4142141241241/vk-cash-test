@@ -15,7 +15,33 @@
       font-size: 32px;
       margin-bottom: 20px;
     }
+    #wheel {
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      border: 10px solid #4CAF50;
+      margin: 0 auto;
+      position: relative;
+      background: conic-gradient(
+        #f44336 0deg 90deg,
+        #ffeb3b 90deg 180deg,
+        #4CAF50 180deg 270deg,
+        #2196F3 270deg 360deg
+      );
+      transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
+    }
+    #pointer {
+      width: 0; 
+      height: 0; 
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 30px solid #000;
+      position: absolute;
+      top: -40px;
+      left: calc(50% - 20px);
+    }
     button {
+      margin-top: 30px;
       font-size: 20px;
       padding: 10px 30px;
       background-color: #4CAF50;
@@ -34,62 +60,53 @@
       font-weight: bold;
       color: #333;
     }
-    .spinning {
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
   </style>
 </head>
 <body>
   <h1>Крутани и Забери</h1>
-  <p>Нажми кнопку и узнай свой выигрыш!</p>
-  <button id="spinBtn" onclick="spin()">Попробовать</button>
+  <div id="wheel-container">
+    <div id="pointer"></div>
+    <div id="wheel"></div>
+  </div>
+  <button id="spinBtn" onclick="spin()">Крутить</button>
   <div class="result" id="result"></div>
 
   <script>
-    let canSpin = true;
+    let spinning = false;
+    let currentRotation = 0;
+    const wheel = document.getElementById("wheel");
+    const resultEl = document.getElementById("result");
+    const btn = document.getElementById("spinBtn");
 
-    const chances = [
-      { prize: 0, chance: 60 },
-      { prize: 50, chance: 25 },
-      { prize: 100, chance: 10 },
-      { prize: 500, chance: 5 }
+    const sectors = [
+      { prize: 0, color: "#f44336" },
+      { prize: 50, color: "#ffeb3b" },
+      { prize: 100, color: "#4CAF50" },
+      { prize: 500, color: "#2196F3" }
     ];
 
-    function getPrize() {
-      const rand = Math.random() * 100;
-      let cumulative = 0;
-      for (let i = 0; i < chances.length; i++) {
-        cumulative += chances[i].chance;
-        if (rand < cumulative) return chances[i].prize;
-      }
-      return 0;
-    }
-
     function spin() {
-      if (!canSpin) return;
-
-      const btn = document.getElementById('spinBtn');
-      const resultEl = document.getElementById('result');
-
+      if (spinning) return;
+      spinning = true;
       btn.disabled = true;
-      canSpin = false;
-      resultEl.innerHTML = 'Крутится...';
+      resultEl.innerHTML = "Крутим...";
+
+      const sectorAngle = 360 / sectors.length;
+      const randSector = Math.floor(Math.random() * sectors.length);
+      const stopAngle = 360 * 5 + randSector * sectorAngle + sectorAngle / 2;
+
+      currentRotation += stopAngle;
+      wheel.style.transform = `rotate(${currentRotation}deg)`;
 
       setTimeout(() => {
-        const prize = getPrize();
-        resultEl.innerHTML = prize === 0
-          ? 'Увы, не повезло. Попробуй ещё!'
+        const prize = sectors[randSector].prize;
+        resultEl.innerHTML = prize === 0 
+          ? "Увы, не повезло. Попробуй ещё!" 
           : `Ты выиграл ${prize}₽!`;
 
-        setTimeout(() => {
-          canSpin = true;
-          btn.disabled = false;
-        }, 10000); // 10 сек ожидания
-      }, 1500); // имитация "кручения"
+        btn.disabled = false;
+        spinning = false;
+      }, 5000);
     }
   </script>
 </body>

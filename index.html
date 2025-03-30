@@ -104,9 +104,9 @@
   function getPrize() {
     if (firstSpin) return 50;
     const rand = Math.random() * 100;
-    if (rand < 5) return 500;
-    if (rand < 15) return 100;
-    if (rand < 30) return 50;
+    if (rand < 8) return 500;
+    if (rand < 20) return 100;
+    if (rand < 40) return 50;
     return 0;
   }
 

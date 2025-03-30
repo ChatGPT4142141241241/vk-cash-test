@@ -1,119 +1,92 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>VK Cash Wheel</title>
   <style>
     body {
-      background: #1a1a1a;
+      background: #111;
       color: #fff;
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 20px;
+      margin: 0;
     }
     #wheel {
-      margin: 40px auto;
+      margin-top: 50px;
       width: 300px;
       height: 300px;
-      border: 10px solid #555;
       border-radius: 50%;
+      border: 10px solid #fff;
       position: relative;
+      margin-left: auto;
+      margin-right: auto;
     }
-    .segment {
-      position: absolute;
-      width: 50%;
-      height: 50%;
-      background: #ff4757;
-      transform-origin: 100% 100%;
-    }
-    #spinBtn {
-      padding: 15px 30px;
-      background: #2ed573;
-      border: none;
-      color: white;
-      font-size: 20px;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-    #payBtn {
+    #spin {
       margin-top: 20px;
-      padding: 12px 25px;
-      background: #1e90ff;
+      padding: 15px 30px;
+      background: #28a745;
       border: none;
       color: white;
       font-size: 18px;
       border-radius: 5px;
       cursor: pointer;
     }
-    #result, #secretCode {
-      margin-top: 25px;
+    #codeDisplay {
+      margin-top: 30px;
       font-size: 20px;
+      color: #00ff00;
     }
-    #copyBtn {
-      margin-top: 10px;
-      background: #666;
+    #pay {
+      margin-top: 30px;
+      padding: 15px 30px;
+      background: #007bff;
       border: none;
       color: white;
-      padding: 8px 16px;
-      border-radius: 4px;
+      font-size: 18px;
+      border-radius: 5px;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <h1>💸 Испытай удачу! 💸</h1>
-
-  <div id="wheel"></div>
-
-  <button id="spinBtn">Крутить колесо</button>
-  <div id="result"></div>
-
-  <div id="secretCode" style="display:none;">
-    <p>🔐 Твой код: <span id="codeText"></span></p>
-    <button id="copyBtn">Скопировать код</button>
-  </div>
-
-  <button id="payBtn" style="display:none;">Оплатить 50₽</button>
+  <h1>Испытай удачу и выиграй деньги!</h1>
+  <div id="wheel">🎰</div>
+  <button id="spin">Крутить колесо</button>
+  <button id="pay" onclick="pay()">Оплатить 50₽</button>
+  <div id="codeDisplay"></div>
 
   <script>
-    const rewards = [0, 0, 50, 0, 100, 0, 250, 0, 500, 0, 1000];
-    let hasSpun = false;
-    const merchantId = "F7202575639398546";
+    let hasPaid = false;
 
-    document.getElementById("spinBtn").addEventListener("click", () => {
-      if (!hasSpun) {
-        hasSpun = true;
-        const result = rewards[Math.floor(Math.random() * rewards.length)];
-        document.getElementById("result").textContent = result > 0
-          ? `🎉 Ты выиграл ${result}₽!`
-          : "😢 Увы, ты не выиграл.";
+    function generateCode(amount) {
+      const timestamp = Date.now();
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let rand = '';
+      for (let i = 0; i < 4; i++) rand += chars[Math.floor(Math.random() * chars.length)];
+      return `CODE-${amount}-${timestamp}-${rand}`;
+    }
 
-        if (result > 0) {
-          const timestamp = Date.now();
-          const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-          const code = `CODE-${result}-${timestamp}-${random}`;
-          document.getElementById("codeText").textContent = code;
-          document.getElementById("secretCode").style.display = "block";
-        } else {
-          document.getElementById("payBtn").style.display = "inline-block";
-        }
-      } else {
-        alert("Попробуй снова после оплаты.");
+    document.getElementById("spin").onclick = () => {
+      if (!hasPaid) {
+        alert("Сначала оплатите 50₽, чтобы крутить колесо.");
+        return;
       }
-    });
 
-    document.getElementById("copyBtn").addEventListener("click", () => {
-      const code = document.getElementById("codeText").textContent;
-      navigator.clipboard.writeText(code).then(() => {
-        alert("Код скопирован!");
-      });
-    });
+      const outcomes = [0, 0, 0, 50, 100, 0, 0, 150];
+      const prize = outcomes[Math.floor(Math.random() * outcomes.length)];
+      if (prize === 0) {
+        document.getElementById("codeDisplay").innerText = "Ты проиграл. Попробуй ещё!";
+      } else {
+        const code = generateCode(prize);
+        document.getElementById("codeDisplay").innerText = `🎉 Ты выиграл ${prize}₽!
+🔐 Твой код: ${code}`;
+      }
+    }
 
-    document.getElementById("payBtn").addEventListener("click", () => {
-      const paymentUrl = `https://pay.freekassa.ru/?m=${merchantId}&oa=50&currency=RUB&o=${Date.now()}`;
-      window.open(paymentUrl, "_blank");
-    });
+    function pay() {
+      hasPaid = true;
+      alert("Платеж прошел успешно (эмуляция). Теперь можешь крутить!");
+    }
   </script>
 </body>
 </html>

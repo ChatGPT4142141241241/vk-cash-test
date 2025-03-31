@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<title>VK Cash Roulette</title>
+<style>
+    body {
+      font-family: sans-serif;
+      background: #0e0e0e;
+      color: white;
+      text-align: center;
+      padding: 30px;
+    }
+
+    #wheel {
+      width: 300px;
+      height: 300px;
+      border: 10px solid #fff;
+      border-radius: 50%;
+      margin: 20px auto;
+      position: relative;
+      background: conic-gradient(#2ecc71 0% 20%, #e74c3c 20% 40%, #3498db 40% 60%, #f1c40f 60% 80%, #9b59b6 80% 100%);
+      transition: transform 4s ease-out;
+    }
+
+    #spin {
+      padding: 10px 20px;
+      font-size: 18px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+
+    #result {
+      font-size: 20px;
+      margin-top: 20px;
+    }
+
+    .top-bar {
+      font-size: 14px;
+      margin-top: 50px;
+      color: #aaa;
+    }
+
+    .code-block {
+      margin-top: 10px;
+      font-family: monospace;
+      background: #1f1f1f;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    #payBtn {
+      display: none;
+      margin-top: 15px;
+      background-color: #2ecc71;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #firstSpinNotice {
+      font-size: 14px;
+      color: #ccc;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+<h1>🎰 Рулетка VK Cash</h1>
+<div id="wheel"></div>
+<button id="spin">Крутить колесо</button>
+<div id="result"></div>
+<div id="firstSpinNotice">* Первая попытка всегда выигрывает</div>
+<button id="payBtn">Попробовать ещё за 50₽</button>
+<div class="top-bar">
+<p>📜 <a href="#">Правила участия</a> • <a href="#">FAQ</a> • <a href="#">Политика</a></p>
+<p>👑 Топ победители обновляются каждые 5 минут</p>
+<p>🔁 Участников: <span id="playersCount"></span></p>
+</div>
+
+</body>
+</html>

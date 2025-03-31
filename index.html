@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <title>VK Cash Roulette</title>
-  <style>
+<meta charset="utf-8"/>
+<title>VK Cash Roulette</title>
+<style>
     body {
       font-family: sans-serif;
       background: #0e0e0e;
@@ -73,20 +74,18 @@
   </style>
 </head>
 <body>
-  <h1>🎰 Рулетка VK Cash</h1>
-  <div id="wheel"></div>
-  <button id="spin">Крутить колесо</button>
-  <div id="result"></div>
-  <div id="firstSpinNotice">* Первая попытка всегда выигрывает</div>
-  <button id="payBtn">Попробовать ещё за 50₽</button>
-
-  <div class="top-bar">
-    <p>📜 <a href="#">Правила участия</a> • <a href="#">FAQ</a> • <a href="#">Политика</a></p>
-    <p>👑 Топ победители обновляются каждые 5 минут</p>
-    <p>🔁 Участников: <span id="playersCount"></span></p>
-  </div>
-
-  <script>
+<h1>🎰 Рулетка VK Cash</h1>
+<div id="wheel"></div>
+<button id="spin">Крутить колесо</button>
+<div id="result"></div>
+<div id="firstSpinNotice">* Первая попытка всегда выигрывает</div>
+<button id="payBtn">Попробовать ещё за 50₽</button>
+<div class="top-bar">
+<p>📜 <a href="#">Правила участия</a> • <a href="#">FAQ</a> • <a href="#">Политика</a></p>
+<p>👑 Топ победители обновляются каждые 5 минут</p>
+<p>🔁 Участников: <span id="playersCount"></span></p>
+</div>
+<script>
     const wheel = document.getElementById("wheel");
     const result = document.getElementById("result");
     const spinBtn = document.getElementById("spin");

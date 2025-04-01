@@ -1,0 +1,127 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>VK CASH</title>
+    <style>
+        body {
+            background-color: #111;
+            color: white;
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .btn {
+            display: inline-block;
+            margin: 20px;
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.8);
+        }
+        .modal-content {
+            background-color: #222;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+        }
+        .close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+        }
+        #winners {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Добро пожаловать в VK Cash!</h1>
+    <a href="https://widget.donatepay.ru/widgets/page/7549bd7deeb167c930b7ab588b1aa54aa82e2910567619e1a834984b89495cf5?widget_id=6642901&sum=50" class="btn" target="_blank">Оплатить 50₽</a>
+    <a href="https://t.me/ZaberiMANY_Bot" class="btn" target="_blank">Забрать выигрыш</a>
+    <br>
+    <button class="btn" onclick="showModal('rules')">📜 Правила участия</button>
+    <button class="btn" onclick="showModal('faq')">❓ FAQ</button>
+    <button class="btn" onclick="showModal('policy')">📄 Политика</button>
+
+    <div id="rules" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideModal('rules')">&times;</span>
+            <h2>📜 Правила участия</h2>
+            <p>1. Участвуй в розыгрыше, оплатив 50₽.<br>
+            2. Получи шанс выиграть до 500₽.<br>
+            3. В случае выигрыша — забери деньги через Telegram-бота.</p>
+        </div>
+    </div>
+
+    <div id="faq" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideModal('faq')">&times;</span>
+            <h2>❓ FAQ</h2>
+            <p><strong>Вопрос:</strong> Как работает система?<br>
+            <strong>Ответ:</strong> После оплаты вы участвуете в рулетке с шансом на выигрыш. Победителей выбирает генератор случайных чисел.</p>
+        </div>
+    </div>
+
+    <div id="policy" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideModal('policy')">&times;</span>
+            <h2>📄 Политика</h2>
+            <p>Все платежи добровольные. Участник соглашается с правилами игры. Деньги не возвращаются.</p>
+        </div>
+    </div>
+
+    <div id="winners">
+        <h2>🏆 Топ победителей</h2>
+        <ul id="winnerList"></ul>
+    </div>
+
+    <script>
+        function showModal(id) {
+            document.getElementById(id).style.display = "block";
+        }
+        function hideModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        const names = ["Игорь", "Саша", "Алина", "Дима", "Олег", "Настя", "Женя", "Рома", "Вика", "Лена"];
+        const winnerList = document.getElementById('winnerList');
+
+        function updateWinners() {
+            winnerList.innerHTML = "";
+            for (let i = 0; i < 5; i++) {
+                const name = names[Math.floor(Math.random() * names.length)];
+                const amount = Math.floor(Math.random() * 500) + 50;
+                const li = document.createElement("li");
+                li.textContent = `${name} — ${amount}₽`;
+                winnerList.appendChild(li);
+            }
+        }
+
+        updateWinners();
+        setInterval(updateWinners, 300000); // Обновление каждые 5 минут
+    </script>
+</body>
+</html>

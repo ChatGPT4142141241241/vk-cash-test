@@ -153,7 +153,7 @@
     </div>
   </div>
 
-  <!-- Форма Payeer -->
+  <!-- Payeer Form -->
   <form id="payeerForm" method="post" action="https://payeer.com/merchant/" target="_blank" style="display:none;">
     <input type="hidden" name="m_shop" value="2210792738">
     <input type="hidden" name="m_orderid" id="m_orderid">
@@ -215,22 +215,25 @@
     }
 
     async function payWithPayeer() {
-      const shopId = "2210792738";
-      const orderId = "VKCASH_" + Date.now();
+      const shop = "2210792738";
       const amount = "50.00";
       const currency = "RUB";
-      const desc = btoa("VK Cash Повторная попытка");
-
-      const signRaw = `${shopId}:${orderId}:${amount}:${currency}:${desc}:${secretKey}`;
-      const hashBuffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(signRaw));
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const sign = hashArray.map(b => b.toString(16).padStart(2, "0")).join("").toUpperCase();
+      const desc = btoa("VK Cash повторная попытка");
+      const orderId = "VKCASH_" + Date.now();
+      const data = `${shop}:${orderId}:${amount}:${currency}:${desc}:${secretKey}`;
+      const sign = await sha256(data);
 
       document.getElementById("m_orderid").value = orderId;
       document.getElementById("m_desc").value = desc;
-      document.getElementById("m_sign").value = sign;
-
+      document.getElementById("m_sign").value = sign.toUpperCase();
       document.getElementById("payeerForm").submit();
+    }
+
+    function sha256(str) {
+      const buffer = new TextEncoder().encode(str);
+      return crypto.subtle.digest("SHA-256", buffer).then(hash => {
+        return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+      });
     }
 
     function generateCode() {

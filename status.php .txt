@@ -1,45 +1,37 @@
 <?php
-// IP адреса Payeer
-$valid_ips = ['185.71.65.92', '185.71.65.189', '149.202.17.210'];
-if (!in_array($_SERVER['REMOTE_ADDR'], $valid_ips)) {
-    exit("Invalid IP");
+if (!in_array($_SERVER['REMOTE_ADDR'], ['185.71.65.92', '185.71.65.189', '149.202.17.210'])) {
+    exit;
 }
 
-// Проверка обязательных параметров
-if (!isset($_POST['m_sign'])) {
-    exit("No signature");
+if (isset($_POST['m_operation_id']) && isset($_POST['m_sign'])) {
+    $m_key = '8KfFEx5giAxaIVYB';
+
+    $arHash = array(
+        $_POST['m_operation_id'],
+        $_POST['m_operation_ps'],
+        $_POST['m_operation_date'],
+        $_POST['m_operation_pay_date'],
+        $_POST['m_shop'],
+        $_POST['m_orderid'],
+        $_POST['m_amount'],
+        $_POST['m_curr'],
+        $_POST['m_desc'],
+        $_POST['m_status']
+    );
+
+    if (isset($_POST['m_params'])) {
+        $arHash[] = $_POST['m_params'];
+    }
+
+    $arHash[] = $m_key;
+    $sign_hash = strtoupper(hash('sha256', implode(':', $arHash)));
+
+    if ($_POST['m_sign'] === $sign_hash && $_POST['m_status'] === 'success') {
+        file_put_contents("payeer_log.txt", date("Y-m-d H:i:s") . " | Успешная оплата: " . $_POST['m_orderid'] . PHP_EOL, FILE_APPEND);
+        exit($_POST['m_orderid'] . '|success');
+    }
+
+    file_put_contents("payeer_log.txt", date("Y-m-d H:i:s") . " | Ошибка: " . $_POST['m_orderid'] . PHP_EOL, FILE_APPEND);
+    exit($_POST['m_orderid'] . '|error');
 }
-
-// Твой секретный ключ (из настроек Payeer)
-$secret = '8KfFEx5giAxaIVYB';
-
-$arHash = [
-    $_POST['m_operation_id'],
-    $_POST['m_operation_ps'],
-    $_POST['m_operation_date'],
-    $_POST['m_operation_pay_date'],
-    $_POST['m_shop'],
-    $_POST['m_orderid'],
-    $_POST['m_amount'],
-    $_POST['m_curr'],
-    $_POST['m_desc'],
-    $_POST['m_status']
-];
-
-// Если передавали дополнительные параметры
-if (isset($_POST['m_params'])) {
-    $arHash[] = $_POST['m_params'];
-}
-
-$arHash[] = $secret;
-
-$sign_hash = strtoupper(hash('sha256', implode(':', $arHash)));
-
-if ($_POST['m_sign'] === $sign_hash && $_POST['m_status'] === 'success') {
-    // Всё хорошо — можно логировать заказ, записывать в базу, разблокировать крутку и т.д.
-    file_put_contents("log.txt", "УСПЕШНАЯ ОПЛАТА: " . $_POST['m_orderid'] . PHP_EOL, FILE_APPEND);
-    exit($_POST['m_orderid'] . "|success");
-} else {
-    file_put_contents("log.txt", "Ошибка оплаты: " . $_POST['m_orderid'] . PHP_EOL, FILE_APPEND);
-    exit($_POST['m_orderid'] . "|error");
-}
+?>

